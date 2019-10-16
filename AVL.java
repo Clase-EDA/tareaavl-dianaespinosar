@@ -439,8 +439,6 @@ public class AVL <T extends Comparable<T>> {
        arbol.add(5);
        arbol.add(110);
        arbol.add(100);
-       arbol.add(4);
-       arbol.add(200);
        arbol.add(50);
        arbol.add(115);
        System.out.println(arbol.imprimirArbol());
