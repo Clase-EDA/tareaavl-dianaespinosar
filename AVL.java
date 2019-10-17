@@ -112,6 +112,7 @@ public class AVL <T extends Comparable<T>> {
     
     private NodoAVL<T> rotacion(NodoAVL<T> n) {
         System.out.println("Rotación");
+        System.out.println(n.getElement() + " tiene F.E. de " + n.getFe());
         NodoAVL<T> alfa = null;
         NodoAVL<T> beta = null;
         NodoAVL<T> gamma = null;
@@ -124,7 +125,7 @@ public class AVL <T extends Comparable<T>> {
         if(n.getFe() == -2){
             //izquierda-Derecha
             if(n.getIzq() != null &&n.getIzq().getFe() == 1){
-                System.out.println("izquierda-Derecha");
+                System.out.println("Izquierda-Derecha");
                 alfa = n;
                 papa = n.getPapa();
                 beta = alfa.getIzq();
@@ -160,7 +161,7 @@ public class AVL <T extends Comparable<T>> {
             }
             //izquierda-izquierda
             else{
-                System.out.println("izquierda-izquierda");
+                System.out.println("Izquierda-Izquierda");
                 alfa = n;
                 papa = n.getPapa();
                 beta = alfa.getIzq();
@@ -187,14 +188,14 @@ public class AVL <T extends Comparable<T>> {
                 int k = altura(alfa.getDer());
                 int r = altura(alfa.getIzq());
                 alfa.setFe(k - r);
-                beta.setFe(altura(gamma) - altura(alfa));
+                beta.setFe(altura(alfa) - altura(gamma));
                 return beta;
             }
         }
         else{
             //derecha-izquierda
             if(n.getDer() != null && n.getDer().getFe() == -1){
-                System.out.println("Derecha-izquierda");
+                System.out.println("Derecha-Izquierda");
                 alfa = n;
                 papa = n.getPapa();
                 beta = alfa.getDer();
@@ -230,7 +231,7 @@ public class AVL <T extends Comparable<T>> {
             }
             //derecha-derecha
             else{
-                System.out.println("derecha-Derecha");
+                System.out.println("Derecha-Derecha");
                 alfa = n;
                 papa = n.getPapa();
                 beta = alfa.getDer();
@@ -292,7 +293,7 @@ public class AVL <T extends Comparable<T>> {
     //Elimina
     
    public T remove(T elem) {
-       System.out.println("Se va a eliminar " + elem);
+       System.out.println("\nSe va a eliminar: " + elem);
         remove1(elem);
         return elem;
     }
@@ -302,61 +303,95 @@ public class AVL <T extends Comparable<T>> {
         if (bor == null) {
             return false;
         } else {
+            
             if (bor.getIzq() == null && bor.getDer() == null) {
+                System.out.println("NO TIENE HIJOS");
                 if(bor == raiz){
                     raiz = null;
                 }else{
                     if (bor.getPapa().getElement().compareTo(elem) > 0) {
-                        System.out.println("Hijo izquierdo");
+                        System.out.println("Es hijo izquierdo");
                         NodoAVL<T> aux = bor.getPapa();
+                        System.out.println("Papa es " + bor.getPapa().getElement());
                         aux.setIzq(null);
                         aux.fe += 1;
                         if(Math.abs(aux.fe) != 1 )
                             eliminaFE(aux);    
-                        //bor.getPapa().setIzq(null);
-                        
                         
                     } else {
-                        System.out.println("Hijo Derecho");
-                        eliminaFE(bor);
-                        bor.getPapa().setDer(null);
-                    
+                        System.out.println("Es hijo Derecho");
+                        NodoAVL<T> aux = bor.getPapa();
+                        System.out.println("Papa es " + bor.getPapa().getElement());
+                        aux.setDer(null);
+                        aux.fe -= 1;
+                        if(Math.abs(aux.fe) != 1 )
+                            eliminaFE(aux);
                     }
                 }
             } else {
+                System.out.println("TIENE AL MENOS UN HIJO");
                 if (bor.getIzq() == null) {
+                    System.out.println("No tiene hijo Izq");
                     if(bor == raiz){;
                         raiz = bor.getDer();
                         raiz.setPapa(null);
                     }
                     else{
-                        eliminaFE(bor);
                         bor.getPapa().cuelga(bor.getDer());
+                        bor.getPapa().fe -= 1;
+                        System.out.println(bor.getPapa().fe);
+                        eliminaFE(bor.getPapa());
                     }
                 }else if(bor.getDer() == null){
+                    System.out.println("No tiene hijo Der");
                     if(bor == raiz){
                         raiz = bor.getDer();
                         raiz.setPapa(null);
                     }
                     else{
-                        eliminaFE(bor);
+                        System.out.println("Tiene los 2 hijos");
                         bor.getPapa().cuelga(bor.getIzq());
+                        bor.getPapa().fe += 1;
+                        System.out.println(bor.getPapa().fe);
+                        eliminaFE(bor.getPapa());
+                        
                     }
                     
                 }
                 else{
+                    System.out.println("TIENE LOS 2 HIJOS");
                     NodoAVL<T> suc = bor.getDer();
-                    while(suc.getIzq() != null)
-                        suc = suc.getIzq();
-                    bor.setElement(suc.getElement());
-                    if(suc == bor.getDer()){
-                        eliminaFE(suc);
+                    System.out.println("Se va a eliminar " + bor.getElement() + " y fe --> " + bor.getFe());
+                    System.out.println("primer suc " + suc.getElement());
+                    
+                    if(suc.getIzq() == null){
+                        System.out.println("Suc no tiene hijos");
+                        bor.setElement(suc.getElement());
                         bor.setDer(suc.getDer());
-                    }else{
-
-                        eliminaFE(suc);
-                        suc.getPapa().setIzq(suc.getDer());
+                        bor.fe -= 1;
+                        if(Math.abs(bor.fe) != 1 )
+                            eliminaFE(bor);
                     }
+                    else{
+                        
+                        while( suc.getIzq().getIzq() != null){
+                        suc = suc.getIzq();
+                        }
+                        bor.setElement(suc.getIzq().getElement());
+                        System.out.println("Ahora bor es " + bor.getElement());
+                        System.out.println("Suc es " + suc.getElement());
+                        NodoAVL aux = suc;
+                        aux.setIzq(suc.getIzq().getDer());
+                        
+                        if(aux.getIzq() != null)
+                            System.out.println("Ahora el hijo izquierdo de suc es " + aux.getIzq().getElement());
+                        else
+                            System.out.println(aux.getElement() + " hijo izq es null");
+                        aux.fe += 1;
+                        if(Math.abs(aux.fe) != 1 )
+                            eliminaFE(aux);
+                    }
+                    
                     
                 }
 
@@ -371,23 +406,29 @@ public class AVL <T extends Comparable<T>> {
     public void eliminaFE(NodoAVL<T> nuevo){
         System.out.println("Vamos a arreglar los factores de equilibrio");
         NodoAVL<T> actual = nuevo;
+        System.out.println(actual.getElement()  + " y su F.E. es " + actual.getFe());
         boolean termine = false;
         if(Math.abs(actual.fe) == 2){
                actual = rotacion (actual);
         }
+        System.out.println("actual ahora es " + actual.getElement() + " F.E. " + actual.fe);
+        if(actual.getPapa() != null)
+            System.out.println("papa actual " + actual.getPapa().getElement());
         while(!termine && actual != null && actual.getPapa() != null){  
             if(actual == actual.getPapa().getIzq()){
                     actual.getPapa().fe += 1;
                     
             }
-            else
+            else{
                 actual.getPapa().fe -= 1;
-                
+            }
             
            if(Math.abs(actual.getPapa().fe) == 2){
-               actual = rotacion (actual.getPapa());
+               
+               actual = rotacion (actual.getPapa()); 
+               System.out.println("actual " + actual.getElement() + " --> " + actual.fe);
            }
-           if(Math.abs(actual.getPapa().fe) == 1)
+           if(actual.getPapa() != null && Math.abs(actual.getPapa().fe) == 1)
                termine = true;
            actual = actual.getPapa();
 
@@ -432,13 +473,15 @@ public class AVL <T extends Comparable<T>> {
     
     public static void main(String[] args) {
         
-       NodoAVL a = new NodoAVL(10);
+       NodoAVL a = new NodoAVL(100);
 
-       AVL arbol = new AVL();
+       AVL arbol = new AVL();/*
        arbol.setRaiz(a);
        arbol.add(5);
        arbol.add(110);
        arbol.add(100);
+       arbol.add(4);
+       arbol.add(200);
        arbol.add(50);
        arbol.add(115);
        System.out.println(arbol.imprimirArbol());
@@ -451,9 +494,31 @@ public class AVL <T extends Comparable<T>> {
        System.out.println("Inicia eliminación");
        arbol.remove(100);
        arbol.remove(5);
+       System.out.println(arbol.imprimirArbol());
        arbol.remove(37);
        arbol.remove(110);
-       
+       */
+
+       arbol.setRaiz(a);
+       arbol.add(300);
+       arbol.add(400);
+       arbol.add(350);
+       arbol.add(375);
+       arbol.add(50);
+       arbol.add(200);
+       arbol.add(360);
+       arbol.add(380);
+       arbol.add(500);
+       arbol.add(390);
+       System.out.println(arbol.imprimirArbol());
+       arbol.remove(375);
+       System.out.println(arbol.imprimirArbol());
+       arbol.remove(50);
+       System.out.println(arbol.imprimirArbol());
+       arbol.remove(400);
+       System.out.println(arbol.imprimirArbol());
+       arbol.remove(380);
+       System.out.println(arbol.imprimirArbol());
      }
 
 }
